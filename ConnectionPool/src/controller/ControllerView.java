@@ -8,6 +8,7 @@ package controller;
 import dao.AgendaBDDao;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import model.Agenda;
 import model.Modelo;
 import model.Observer;
@@ -50,6 +51,12 @@ public class ControllerView implements Observer {
         if ("Excluir".equals(evt.getActionCommand())) {
             this.model.excluir(this.id);
 
+        }
+        
+        if ("Buscar".equals(evt.getActionCommand())) {
+            System.out.println("Hhhs");
+           this.view.mostrarResultado(this.model.buscarNome(this.view.getTxtBuscar().getText()));
+            
         }
 
      

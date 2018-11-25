@@ -89,5 +89,17 @@ public class Modelo {
     public void setDao(Dao dao) {
         this.dao = dao;
     }
+    
+    public String buscarNome(String nome){
+        String resultado="";
+        ArrayList array = (ArrayList) this.dao.buscar();
+        for (Object array1 : array) {
+            
+            if  (nome.equals(((Agenda)array1).getNome()) ) {
+                resultado = resultado + "\n"+array1.toString();
+            }
+        }
+        return resultado;
+    }
 
 }

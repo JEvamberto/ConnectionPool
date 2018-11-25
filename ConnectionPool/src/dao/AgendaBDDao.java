@@ -24,7 +24,7 @@ public class AgendaBDDao implements Dao{
     private Conexao conexao;
     
     public AgendaBDDao(){
-          this.pool= new ConnectionPool("jdbc:mysql://localhost:3306/db_Agenda","root","ASenhaAqui","com.mysql.jdbc.Driver");
+          this.pool= new ConnectionPool("jdbc:mysql://localhost:3306/db_Agenda","root","SuaSenhaAqui","com.mysql.jdbc.Driver");
     }
 
     @Override
