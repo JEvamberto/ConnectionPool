@@ -5,80 +5,88 @@
  */
 package connectionPool;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 /**
  *
  * @author jose
  */
 public class ConnectionPool {
 
-    private static String driver;
-    private static String url;
-    private static String user;
-    private static String password;
-    private static ArrayList<Connection> conexaoFila;
-    private static ArrayList<Connection> filaConexaoUsada;
+    private String driver;
+    private String url;
+    private String user;
+    private String password;
+    private Conexao[] conexaos = new Conexao[10];
+    private int qtdConexExistente;
+    private int qtdConexUtilizado;
 
-    private int tamanhoPool;
-
-    public ConnectionPool(String url1, String user1, String password1,String driver, ArrayList pool1) {
-       
-        ConnectionPool.url=url1;
-        ConnectionPool.user=user1;
-        ConnectionPool.password=password1;
-        ConnectionPool.conexaoFila=pool1;
-        ConnectionPool.driver=driver;
-               
+    public ConnectionPool(String url, String user, String password, String driver) {
         
-
-    }
-
-    public static ConnectionPool criar(String url, String user, String password,String driver) {
-
-        conexaoFila = new ArrayList<>(4);
-        filaConexaoUsada = new ArrayList<>(4);
+        this.driver=driver;
+        this.url=url;
+        this.password=password;
+        this.user=user;
 
         for (int i = 0; i < 4; i++) {
 
-            try {
-                conexaoFila.add(criarConexao(url, user, password,driver));
-            } catch (SQLException | ClassNotFoundException ex) {
-
-                System.err.println("Erro ao conectar ao banco de dados:" + ex);
-
-            }
+            conexaos[i] = new Conexao(url, user, password, driver);
+            
+            this.qtdConexExistente = i;
 
         }
 
-        return new ConnectionPool(url,user,password,driver,conexaoFila) ;
     }
+    
+    
+    public Conexao getConnection() {
+        Conexao conexao = null;
 
-    public static Connection criarConexao(String url, String user, String password,String driver1) throws SQLException, ClassNotFoundException {
         
-        driver=driver1;
-      Class.forName(driver);
+        for (int i = 0; i < this.qtdConexExistente; i++) {
+            if (!conexaos[i].isUsado()) {
+                
+                   conexaos[i].setUsado(true);
+                   conexao=conexaos[i];
+                   
+               
+                break;
+            }
+           
+           
+            
+        }
+        
+       
 
-        return DriverManager.getConnection(url, user, password);
+        this.qtdConexUtilizado++;
+        
+         if (this.qtdConexExistente == this.qtdConexUtilizado) {
+
+            if (this.qtdConexExistente < this.conexaos.length) {
+
+                this.conexaos[this.qtdConexExistente + 1] = new Conexao(this.url, this.user, this.password, this.driver);
+            }
+        }
+
+        return conexao;
     }
 
-    public Connection getConnection() {
-        Connection connection = conexaoFila.remove(0);
-        filaConexaoUsada.add(connection);
+    public boolean devolveConexao(Conexao connection) {
+        this.qtdConexUtilizado--;
+        boolean resultado=false;
+            for (int i = 0; i <this.qtdConexExistente; i++) {
+                
+                if (conexaos[i].getId()==connection.getId()) {
+                    
+                    connection.setUsado(false);
+                    conexaos[qtdConexExistente].setUsado(false);
+                    resultado=true;
+                    
+                }else{
+                    
+                }
+            }
 
-        return connection;
-    }
-
-    public boolean devolveConexao(Connection connection) {
-
-        boolean resultado;
-        conexaoFila.add(connection);
-        resultado = filaConexaoUsada.remove(connection);
-
-        return resultado;
+       return resultado;
     }
 
 }
